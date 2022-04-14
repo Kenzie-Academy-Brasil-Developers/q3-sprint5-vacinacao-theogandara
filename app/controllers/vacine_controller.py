@@ -1,5 +1,9 @@
-from flask import current_app, jsonify, request, session
+from http import HTTPStatus
+from flask import current_app, jsonify, request
 from app.models.vacine_model import Vacine
+from sqlalchemy.exc import IntegrityError
+from app.exc.errors import CpfInvalid
+from app.services.verif_data import verify_data
 
 
 def get_vacines():
@@ -21,13 +25,35 @@ def get_vacines():
 def create_vacine():
     data = request.get_json()
 
-    new_vaccine = Vacine(**data)
+    verify_data(data)
 
-    session = current_app.db.session
+    for key in data.keys():
+        if type(data[key]) != str:
+            return {"error": f" A chave {key} está em um formato inválido."}
 
-    session.add(new_vaccine)
-    session.commit()
+    try:
+        new_vaccine = Vacine(
+            cpf=data["cpf"],
+            name=data["name"],
+            vaccine_name=data["vaccine_name"],
+            health_unit_name=data["health_unit_name"],
+        )
 
-    print(new_vaccine)
+        session = current_app.db.session
 
-    return "", 201
+        session.add(new_vaccine)
+        session.commit()
+
+        return "", 201
+
+    except IntegrityError:
+        return {"message": "CPF já cadastrado."}, HTTPStatus.CONFLICT
+
+    except CpfInvalid:
+        return {"message": "O CPF não está no formato correto."}, HTTPStatus.BAD_REQUEST
+
+    except KeyError as err:
+        return {"message": f"Está faltando a Key {str(err)}."}, HTTPStatus.BAD_REQUEST
+
+
+    
