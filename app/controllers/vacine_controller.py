@@ -4,6 +4,7 @@ from app.models.vacine_model import Vacine
 from sqlalchemy.exc import IntegrityError
 from app.exc.errors import CpfInvalid
 from app.services.verif_data import verify_data
+from app.services.generate_data import data_generate
 
 
 def get_vacines():
@@ -15,6 +16,8 @@ def get_vacines():
             "name": vacine.name,
             "vaccine_name": vacine.vaccine_name,
             "health_unit_name": vacine.health_unit_name,
+            "first_shot_date": vacine.first_shot_date,
+            "second_shot_date": vacine.second_shot_date
         }
         for vacine in vacines
     ]
@@ -37,6 +40,8 @@ def create_vacine():
             name=data["name"],
             vaccine_name=data["vaccine_name"],
             health_unit_name=data["health_unit_name"],
+            first_shot_date=data_generate(),
+            second_shot_date=data_generate()
         )
 
         session = current_app.db.session
