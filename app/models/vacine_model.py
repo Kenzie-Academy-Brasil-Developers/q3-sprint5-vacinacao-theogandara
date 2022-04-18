@@ -8,12 +8,12 @@ from app.exc.errors import CpfInvalid
 @dataclass
 class Vacine(db.Model):
 
-    cpf = str
-    name = str
-    first_shot_date = DateTime
-    second_shot_date = DateTime
-    vaccine_name = str
-    health_unit_name = str
+    cpf: str
+    name: str
+    first_shot_date: DateTime
+    second_shot_date: DateTime
+    vaccine_name: str
+    health_unit_name: str
 
     __tablename__ = "vaccine_cards"
 

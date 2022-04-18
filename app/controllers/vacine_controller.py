@@ -49,7 +49,7 @@ def create_vacine():
         session.add(new_vaccine)
         session.commit()
 
-        return "", 201
+        return jsonify(new_vaccine), 201
 
     except IntegrityError:
         return {"message": "CPF já cadastrado."}, HTTPStatus.CONFLICT
